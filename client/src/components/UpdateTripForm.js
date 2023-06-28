@@ -1,31 +1,31 @@
 import {useState} from 'react'
 
-function UpdateHotelForm({updateHotel, setIdToUpdate, updatePatchFormData, hotels}){
+function UpdateTripForm({updateTrip, setIdToUpdate, updatePatchFormData, trips}){
 
     const [updateFormSubmitted, setUpdateFormSubmitted] = useState(false)
 
     return (
-        <div className="hotel-form">
-            <h2>Update Hotel Form</h2>
-            {updateFormSubmitted ? <h1>Hotel Updated!</h1> :
+        <div className="trip-form">
+            <h2>Update Trip Form</h2>
+            {updateFormSubmitted ? <h1>Trip Updated!</h1> :
             <form onSubmit={event => {
-                updateHotel(event)
+                updateTrip(event)
                 setUpdateFormSubmitted(updateFormSubmitted => !updateFormSubmitted)
             }}>
-                <label>Choose a Hotel: </label>
+                <label>Choose a Trip: </label>
                 <select onChange={(event) => {
                     setIdToUpdate(event.target.value)
                 }} name="id">
-                {hotels.map(hotel => {
-                    return <option key={hotel.id} value={hotel.id}>{`${hotel.id}: ${hotel.name}`}</option>
+                {trips.map(trip => {
+                    return <option key={trip.id} value={trip.id}>{`${trip.id}: ${trip.name}`}</option>
                 })}
                 </select>
                 <input onChange={updatePatchFormData} type="text" name="name" placeholder="Hotel name"/>
                 <input onChange={updatePatchFormData} type="text" name="image" placeholder="Image URL"/>
-                <input type="submit" value="Update Hotel"/>
+                <input type="submit" value="Update Trip"/>
             </form>}
         </div>
     )
 }
 
-export default UpdateHotelForm
+export default UpdateTripForm
