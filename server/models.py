@@ -10,7 +10,7 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 
-class User(db.Model):
+class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -25,9 +25,13 @@ class User(db.Model):
         if not value:
             raise ValueError('Please create an account to continue :)')
         return value
+    
+    serialize_rules = ('-trips',)
+    
+    # def __repr__(self):
+    #     return f"User #{self.id}: {self.username}"
 
-
-class Country(db.Model):
+class Country(db.Model, SerializerMixin):
     __tablename__ = 'countries'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -35,8 +39,13 @@ class Country(db.Model):
 
     trips = db.relationship('Trip', backref='country', lazy=True)
 
+    serialize_rules = ('-trips',)
 
-class Trip(db.Model):
+
+    # def __repr__(self):
+    #     return f"Country #{self.id}: {self.name}"
+
+class Trip(db.Model, SerializerMixin):
     __tablename__ = 'trips'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -45,5 +54,7 @@ class Trip(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     country_id = db.Column(db.Integer, db.ForeignKey('countries.id'), nullable=False)
 
-    def __repr__(self):
-        return f"Trip #{self.id}: User #{self.user_id} visited {self.country.name} on {self.date_visited}"
+    serialize_rules = ('-country', '-user')
+
+    # def __repr__(self):
+    #     return f"Trip #{self.id}: User #{self.user_id} visited {self.country.name} on {self.date_visited}"
