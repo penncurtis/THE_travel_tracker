@@ -20,6 +20,12 @@ class User(db.Model):
 
     trips = db.relationship('Trip', backref='user', lazy=True)
 
+    @validates('username', 'password', 'email')
+    def validate_account(self, key, value):
+        if not value:
+            raise ValueError('Please create an account to continue :)')
+        return value
+
 
 class Country(db.Model):
     __tablename__ = 'countries'

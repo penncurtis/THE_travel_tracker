@@ -25,61 +25,70 @@ api = Api(app)
 
 class UserByID(Resource):
     def get(self, user_id):
-        user = User.query.get_or_404(user_id)
+        user = User.query.filter_by(User.id == id).first()
         response_body = user.to_dict()
         return make_response(jsonify(response_body), 200)
 
-    def delete(self, user_id):
-        user = User.query.get_or_404(user_id)
-        db.session.delete(user)
+    def post(self):
+        data = request.get_json()
+        new_user = User(username=data['username'], password=data['password'], email=data['email'])
+        db.session.add(new_user)
         db.session.commit()
-        return make_response(jsonify({'message': 'User deleted'}), 200)
-
+        response_body = new_user.to_dict()
+        return make_response(jsonify(response_body), 201)
+    
 api.add_resource(UserByID, '/users/<int:user_id>')
 
-class Trips(Resource):
+class Countries(Resource):
     def get(self):
-        trips = Trip.query.all()
-        response_body = [trip.to_dict() for trip in trips]
+        countries = Country.query.all()
+        response_body = [country.to_dict() for country in countries]
         return make_response(jsonify(response_body), 200)
-
-    def post(self):
-        try:
-            data = request.get_json()
-            new_trip = Trip(user_id=data['user_id'], country_id=data['country_id'], date_visited=data['date_visited'])
-            db.session.add(new_trip)
-            db.session.commit()
-            response_body = new_trip.to_dict()
-            return make_response(jsonify(response_body), 201)
-        except ValueError as error:
-            response_body = {
-                "error": error.args
-            }
-            return make_response(jsonify(response_body), 422)
-
-api.add_resource(Trips, '/trips')
-
-class TripByID(Resource):
-    def get(self, trip_id):
-        trip = Trip.query.get_or_404(trip_id)
-        response_body = trip.to_dict()
-        return make_response(jsonify(response_body), 200)
-
-    def delete(self, trip_id):
-        trip = Trip.query.get_or_404(trip_id)
-        db.session.delete(trip)
-        db.session.commit()
-        return make_response(jsonify({'message': 'Trip deleted'}), 200)
-
-api.add_resource(TripByID, '/trips/<int:trip_id>')
+    
+api.add_resource(Countries, '/countries')
 
 class CountryByID(Resource):
     def get(self, country_id):
-        country = Country.query.get_or_404(country_id)
+        country = Country.query.filter_by(Country.id == id).first()
         response_body = country.to_dict()
         return make_response(jsonify(response_body), 200)
 
 api.add_resource(CountryByID, '/countries/<int:country_id>')
+
+class TripsByID(Resource):
+    def get(self, trip_id):
+        trip = Trip.query.filter_by(Trip.id == id).first()
+        response_body = trip.to_dict()
+        return make_response(jsonify(response_body), 200)
+
+    def post(self):
+        data = request.get_json()
+        new_trip = Trip(
+            user_id=data['user_id'], 
+            country_id=data['country_id'], 
+            date_visited=data['date_visited']
+        )
+        db.session.add(new_trip)
+        db.session.commit()
+        response_body = new_trip.to_dict()
+        return make_response(jsonify(response_body), 201)
+
+    def patch(self, trip_id):
+        trip = Trip.query.filter_by(Trip.id == id).first()
+        data = request.get_json()
+        for attr in data:
+            setattr(trip, attr, data[attr])
+        db.session.commit()
+        response_body = trip.to_dict()
+        return make_response(jsonify(response_body), 200)
+
+    def delete(self, trip_id):
+        trip = Trip.query.filter_by(Trip.id == id).first()
+        db.session.delete(trip)
+        db.session.commit()
+        return make_response(jsonify({'message': 'Trip deleted'}), 200)
+
+api.add_resource(TripsByID, '/trips/<int:trip_id>')
 
 if __name__ == '__main__':
     app.run(port=7000, debug=True)
