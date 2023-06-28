@@ -10,71 +10,34 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 
-class Hotel(db.Model, SerializerMixin):
-    __tablename__ = 'hotels'
-
-    serialize_rules = ('-reviews',)
+class User(db.Model):
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-    image = db.Column(db.String, nullable=False)
+    username = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
 
-    reviews = db.relationship('Review', back_populates='hotel')
+    trips = db.relationship('Trip', backref='user', lazy=True)
 
-    customers = association_proxy('reviews', 'customer',
-        creator=lambda c: Review(customer=c))
 
-    @validates('name')
-    def validate_name(self, key, value):
-        if len(value) < 5:
-            raise ValueError(f"{key} must be at least 5 characters long.")
-        return value
-    
-    def __repr__(self):
-        return f"Hotel # {self.id}: {self.name} hotel"
-
-class Customer(db.Model, SerializerMixin):
-    __tablename__ = 'customers'
-
-    serialize_rules = ('-reviews',)
+class Country(db.Model):
+    __tablename__ = 'countries'
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, unique=True, nullable=False)
 
-    reviews = db.relationship('Review', back_populates='customer')
+    trips = db.relationship('Trip', backref='country', lazy=True)
 
-    hotels = association_proxy('reviews', 'hotel',
-        creator=lambda h: Review(hotel=h))
 
-    __table_args__ = (
-        db.CheckConstraint('(first_name != last_name)'),
-    )
-
-    @validates('first_name', 'last_name')
-    def validate_first_name(self, key, value):
-        if value is None:
-            raise ValueError(f"{key} cannot be null.")
-        elif len(value) < 4:
-            raise ValueError(f"{key} must be at least 4 characters long.")
-        return value
-    
-    def __repr__(self):
-        return f"Customer # {self.id}: {self.first_name} {self.last_name}"
-    
-class Review(db.Model, SerializerMixin):
-    __tablename__ = 'reviews'
-
-    serialize_rules = ('-hotel.reviews', '-customer.reviews')
+class Trip(db.Model):
+    __tablename__ = 'trips'
 
     id = db.Column(db.Integer, primary_key=True)
-    rating = db.Column(db.Integer)
+    date_visited = db.Column(db.Date, nullable=False)
 
-    hotel_id = db.Column(db.Integer, db.ForeignKey('hotels.id'))
-    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'))
-
-    hotel = db.relationship('Hotel', back_populates='reviews')
-    customer = db.relationship('Customer', back_populates='reviews')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'), nullable=False)
 
     def __repr__(self):
-        return f"Review # {self.id}: {self.customer.first_name} {self.customer.last_name} left of a review for {self.hotel.name} with a rating of {self.rating}."
+        return f"Trip #{self.id}: User #{self.user_id} visited {self.country.name} on {self.date_visited}"
