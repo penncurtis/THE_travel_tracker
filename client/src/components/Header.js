@@ -2,7 +2,7 @@ function Header(){
     return (
         <header>
             <h1>
-            Hotels Website
+            Travel Tracker Website
             <span className="logo" role="img">
                 🏨
             </span>

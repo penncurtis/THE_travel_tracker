@@ -4,33 +4,40 @@ import { Route, Switch } from "react-router-dom"
 
 import NavBar from './NavBar'
 import Header from './Header'
-import HotelList from './HotelList'
-import NewHotelForm from './NewHotelForm'
-import UpdateHotelForm from './UpdateHotelForm'
+import CountryList from './CountryList'
+import NewTripForm from './NewTripForm'
+import UpdateTripForm from './UpdateTripForm'
 
 function App() {
 
-  const [hotels, setHotels] = useState([])
+  const [countries, setCountries] = useState([])
+  const [trips, setTrips] = useState([])
   const [postFormData, setPostFormData] = useState({})
   const [idToUpdate, setIdToUpdate] = useState(0)
   const [patchFormData, setPatchFormData] = useState({})
 
   useEffect(() => {
-    fetch('/hotels')
+    fetch('http://localhost:4000/countries')
     .then(response => response.json())
-    .then(hotelData => setHotels(hotelData))
+    .then(countryData => setCountries(countryData))
   }, [])
 
   useEffect(() => {
-    if(hotels.length > 0 && hotels[0].id){
-      setIdToUpdate(hotels[0].id)
-    }
-  }, [hotels])
+    fetch('/trips')
+    .then(response => response.json())
+    .then(tripData => setTrips(tripData))
+  }, [])
 
-  function addHotel(event){
+  useEffect(() => {
+    if(trips.length > 0 && trips[0].id){
+      setIdToUpdate(trips[0].id)
+    }
+  }, [trips])
+
+  function addTrip(event){
     event.preventDefault()
 
-    fetch('/hotels', {
+    fetch('/trips', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,12 +46,12 @@ function App() {
       body: JSON.stringify(postFormData)
     })
     .then(response => response.json())
-    .then(newHotel => setHotels(hotels => [...hotels, newHotel]))
+    .then(newTrip => setTrips(trips => [...trips, newTrip]))
   }
 
-  function updateHotel(event){
+  function updateTrip(event){
     event.preventDefault()
-    fetch(`/hotels/${idToUpdate}`, {
+    fetch(`/trips/${idToUpdate}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -53,27 +60,27 @@ function App() {
       body: JSON.stringify(patchFormData)
     })
     .then(response => response.json())
-    .then(updatedHotel => {
-      setHotels(hotels => {
-        return hotels.map(hotel => {
-          if(hotel.id === updatedHotel.id){
-            return updatedHotel
+    .then(updatedTrip => {
+      setTrips(trips => {
+        return trips.map(trip => {
+          if(trip.id === updatedTrip.id){
+            return updatedTrip
           }
           else{
-            return hotel
+            return trip
           }
         })
       })
     })
   }
 
-  function deleteHotel(id){
-    fetch(`/hotels/${id}`, {
+  function deleteTrip(id){
+    fetch(`/trips/${id}`, {
       method: "DELETE"
     })
-    .then(() => setHotels(hotels => {
-      return hotels.filter(hotel => {
-        return hotel.id !== id
+    .then(() => setTrips(trips => {
+      return trips.filter(trip => {
+        return trip.id !== id
       })
     }))
   }
@@ -92,14 +99,14 @@ function App() {
       <Header />
       <Switch>
         <Route exact path="/">
-          <h1>Welcome! Here is the list of hotels available:</h1>
-          <HotelList hotels={hotels} deleteHotel={deleteHotel}/>
+          <h1>Welcome! Here is the list of Trips:</h1>
+          <CountryList countries={countries}/>
         </Route>
-        <Route path="/add_hotel">
-          <NewHotelForm addHotel={addHotel} updatePostFormData={updatePostFormData}/>
+        <Route path="/add_trip">
+          <NewTripForm addTrip={addTrip} updatePostFormData={updatePostFormData}/>
         </Route>
-        <Route path="/update_hotel">
-          <UpdateHotelForm updateHotel={updateHotel} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} hotels={hotels}/>
+        <Route path="/update_trip">
+          <UpdateTripForm updateTrip={updateTrip} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} trips={trips}/>
         </Route>
       </Switch>
     </div>
