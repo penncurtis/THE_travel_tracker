@@ -35,7 +35,9 @@ class Country(db.Model, SerializerMixin):
     __tablename__ = 'countries'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, nullable=False)
+    country_name = db.Column(db.String, unique=True, nullable=False)
+    country_code = db.Column(db.String,  nullable=False)
+    country_image = db.Column(db.String, nullable=False)
 
     trips = db.relationship('Trip', backref='country', lazy=True)
 
