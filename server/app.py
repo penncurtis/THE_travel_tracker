@@ -24,7 +24,7 @@ db.init_app(app)
 api = Api(app)
 
 class UserByID(Resource):
-    def get(self, user_id):
+    def get(self, id):
         user = User.query.filter_by(User.id == id).first()
         response_body = user.to_dict()
         return make_response(jsonify(response_body), 200)
@@ -37,7 +37,7 @@ class UserByID(Resource):
         response_body = new_user.to_dict()
         return make_response(jsonify(response_body), 201)
     
-api.add_resource(UserByID, '/users/<int:user_id>')
+api.add_resource(UserByID, '/users/<int:id>')
 
 class Countries(Resource):
     def get(self):
@@ -48,20 +48,20 @@ class Countries(Resource):
 api.add_resource(Countries, '/countries')
 
 class CountryByID(Resource):
-    def get(self, country_id):
+    def get(self, id):
         country = Country.query.filter_by(Country.id == id).first()
         response_body = country.to_dict()
         return make_response(jsonify(response_body), 200)
 
-api.add_resource(CountryByID, '/countries/<int:country_id>')
+api.add_resource(CountryByID, '/countries/<int:id>')
 
 class TripsByID(Resource):
-    def get(self, trip_id):
+    def get(self, id):
         trip = Trip.query.filter_by(Trip.id == id).first()
         response_body = trip.to_dict()
         return make_response(jsonify(response_body), 200)
 
-    def post(self):
+    def post(self, id):
         data = request.get_json()
         new_trip = Trip(
             user_id=data['user_id'], 
@@ -73,7 +73,7 @@ class TripsByID(Resource):
         response_body = new_trip.to_dict()
         return make_response(jsonify(response_body), 201)
 
-    def patch(self, trip_id):
+    def patch(self, id):
         trip = Trip.query.filter_by(Trip.id == id).first()
         data = request.get_json()
         for attr in data:
@@ -82,13 +82,13 @@ class TripsByID(Resource):
         response_body = trip.to_dict()
         return make_response(jsonify(response_body), 200)
 
-    def delete(self, trip_id):
+    def delete(self, id):
         trip = Trip.query.filter_by(Trip.id == id).first()
         db.session.delete(trip)
         db.session.commit()
         return make_response(jsonify({'message': 'Trip deleted'}), 200)
 
-api.add_resource(TripsByID, '/trips/<int:trip_id>')
+api.add_resource(TripsByID, '/trips/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=7000, debug=True)
