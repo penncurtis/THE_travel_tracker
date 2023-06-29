@@ -216,9 +216,9 @@ with app.app_context():
         db.session.commit()
 
     user_data = [
-        {"username": "john123", "password": "password123", "email": "john@example.com"},
-        {"username": "emma456", "password": "password456", "email": "emma@example.com"},
-        {"username": "alex789", "password": "password789", "email": "alex@example.com"},
+        {"username": "john123", "age": 25, "email": "john@example.com"},
+        {"username": "emma456", "age": 34, "email": "emma@example.com"},
+        {"username": "alex789", "age": 42, "email": "alex@example.com"},
     ]
 
     # Function to seed users
@@ -231,10 +231,10 @@ with app.app_context():
     
     # List of trip data
     trip_data = [
-        {"user_id": 1, "country_id": 10, "date_visited": date(2022, 5, 10)},
-        {"user_id": 1, "country_id": 27, "date_visited": date(2022, 7, 22)},
-        {"user_id": 2, "country_id": 5, "date_visited": date(2023, 1, 5)},
-        {"user_id": 3, "country_id": 45, "date_visited": date(2023, 3, 18)},
+        {"user_id": 1, "country_name": 'India', "date_visited": '2022-05-10'},
+        {"user_id": 1, "country_name": 'Hungary', "date_visited": '2022-07-22'},
+        {"user_id": 2, "country_name": 'China', "date_visited": '2023-01-05'},
+        {"user_id": 3, "country_name": 'Canada', "date_visited": '2023-03-18'},
     ]
 
     # Function to seed trips

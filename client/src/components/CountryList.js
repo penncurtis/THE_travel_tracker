@@ -7,7 +7,7 @@ function CountryList({countries}){
     })
 
     return (
-        <div className="country-list">{countryComponents}</div>
+        <div className="card-container">{countryComponents}</div>
         )
 }
 

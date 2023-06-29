@@ -118,10 +118,12 @@ class Trips(Resource):
     
     def post(self):
         data = request.get_json()
+        user = User.query.filter_by(username=data['username']).first().to_dict()
+       
         new_trip = Trip(
-            user_id=data['user_id'], 
-            country_id=data['country_id'], 
-            date_visited=datetime.strptime(data['date_visited'], '%Y-%m-%d').date()
+            user_id=user['id'], 
+            country_name=data['country_name'], 
+            date_visited=data['date_visited']
         )
         db.session.add(new_trip)
         db.session.commit()
@@ -154,4 +156,4 @@ class TripsByID(Resource):
 api.add_resource(TripsByID, '/trips/<int:id>')
 
 if __name__ == '__main__':
-    app.run(port=7000, debug=True)
+    app.run(port=7777, debug=True)

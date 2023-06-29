@@ -16,15 +16,21 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password = db.Column(db.String, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
 
     trips = db.relationship('Trip', backref='user', lazy=True)
 
-    @validates('username', 'password', 'email')
+    @validates('username', 'email')
     def validate_account(self, key, value):
         if not value:
             raise ValueError('Please create an account to continue :)')
+        return value
+    
+    @validates('age')
+    def validate_age(self, key, value):
+        if not value >= 18:
+            raise ValueError("must be 18 or over to play this very fun game")
         return value
     
     serialize_rules = ('-trips',)
@@ -52,10 +58,10 @@ class Trip(db.Model, SerializerMixin):
     __tablename__ = 'trips'
 
     id = db.Column(db.Integer, primary_key=True)
-    date_visited = db.Column(db.Date, nullable=False)
+    date_visited = db.Column(db.String, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'), nullable=False)
+    country_name = db.Column(db.String, db.ForeignKey('countries.country_name'), nullable=False)
 
     serialize_rules = ('-country', '-user')
 

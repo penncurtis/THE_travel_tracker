@@ -13,7 +13,7 @@ function Trip({trip}){
     return (
         <div className="card">
             <h1>Trip # {trip.id}: {trip.country_id}</h1>
-            <img onClick={toggleCard} src={trip.date_visited} alt={trip.country_id}/>
+            <p>{trip.date_visited}</p>
             <p>{trip.country_id}</p>
         </div>
     )

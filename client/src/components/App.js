@@ -8,8 +8,8 @@ import CountryList from './CountryList'
 import TripsList from './TripsList'
 import NewTripForm from './NewTripForm'
 import UpdateTripForm from './UpdateTripForm'
-import TripsList from './TripsList'
 import Search from './Search'
+import SearchTrip from './SearchTrip'
 import Login from "./Login"
 import Signup from "./Signup"
 import UserDetails from "./UserDetails"
@@ -23,7 +23,8 @@ function App() {
   const [idToUpdate, setIdToUpdate] = useState(0)
   const [patchFormData, setPatchFormData] = useState({})
   const [users, setUsers] = useState([])
-  const [search, setSearch] = useState('')
+  const [searchCountry, setSearchCountry] = useState('')
+  const [searchTrip, setSearchTrip] = useState(NaN)
   const [currentUser, setCurrentUser] = useState(null)
 
   // http://127.0.0.1:7000
@@ -40,11 +41,11 @@ function App() {
     .then(tripData => setTrips(tripData))
   }, [])
 
-  useEffect(() => {
-    if(trips.length > 0 && trips[0].id){
-      setIdToUpdate(trips[0].id)
-    }
-  }, [trips])
+  // useEffect(() => {
+  //   if(trips.length > 0 && trips[0].id){
+  //     setIdToUpdate(trips[0].id)
+  //   }
+  // }, [trips])
 
   useEffect(() => {
     fetch('/users')
@@ -82,6 +83,9 @@ function App() {
 
   function addTrip(event){
     event.preventDefault()
+   
+
+    console.log(postFormData)
 
     fetch('/trips', {
       method: "POST",
@@ -97,6 +101,7 @@ function App() {
 
   function updateTrip(event){
     event.preventDefault()
+    console.log(patchFormData)
     fetch(`/trips/${idToUpdate}`, {
       method: "PATCH",
       headers: {
@@ -120,27 +125,41 @@ function App() {
     })
   }
 
-  function deleteTrip(id){
+  function deleteTrip(event, id){
+    event.preventDefault()
     fetch(`/trips/${id}`, {
       method: "DELETE"
     })
-    .then(() => setTrips(trips => {
+    .then(() => {
+      alert('Trip deleted!')
+      setTrips(trips => {
       return trips.filter(trip => {
         return trip.id !== id
       })
-    }))
+    })})
   }
 
-function searchCountry(e) {
-    setSearch(e.target.value)
-}
+  function searchCountries(e) {
+      setSearchCountry(e.target.value)
+  }
 
-const filterCountry = countries.filter(country => {
-    if (search ==='') {
+  const filterCountry = countries.filter(country => {
+      if (searchCountry ==='') {
+          return true
+      }
+      return country.country_name.toLowerCase().includes(searchCountry.toLowerCase())
+  })
+
+  function searchTrips(e) {
+    setSearchTrip(parseInt(e.target.value))
+  }
+
+  const filterTrip = trips.filter(trip => {
+    if (isNaN(searchTrip)) {
         return true
     }
-    return country.country_name.toLowerCase().includes(search.toLowerCase())
-})
+    return trip.user_id === searchTrip
+  })
 
   function updatePostFormData(event){
     setPostFormData({...postFormData, [event.target.name]: event.target.value})
@@ -152,30 +171,26 @@ const filterCountry = countries.filter(country => {
 
   return (
     <div className="app">
-      { !currentUser ? <Signup attemptSignup={attemptSignup} /> : null }
-
-      { currentUser ? <UserDetails currentUser={currentUser} logout={logout} /> : null }
-
       <NavBar/>
       <Header />
       <Switch>
         <Route exact path="/">
-          <h1>Welcome! Here is the list of Trips:</h1>
-          <Search search = {search} setSearch = {setSearch} searchCountry = {searchCountry}/>
+          <h1>Welcome! Here is the list of Countries:</h1>
+          <Search searchCountry = {searchCountry} searchCountries = {searchCountries} />
           <CountryList countries={filterCountry}/>
         </Route>
         <Route path="/trips">
-          <TripsList users = {users} trips={trips} deleteTrip={deleteTrip} />
+           < TripsList users = {users} trips={trips} deleteTrip={deleteTrip} countries={filterCountry} />
         </Route>
         <Route path="/add_trip">
           <NewTripForm users = {users} addTrip={addTrip} updatePostFormData={updatePostFormData}/>
         </Route>
         <Route path="/update_trip">
-          <UpdateTripForm updateTrip={updateTrip} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} trips={trips}/>
+          <UpdateTripForm updateTrip={updateTrip} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} trips={trips} deleteTrip={deleteTrip}/>
         </Route>
-        <Route path="/search">
-          <Search search = {search} setSearch = {setSearch} searchCountry = {searchCountry}/>
-          <CountryList countries={filterCountry}/>
+        <Route path="/search_trip">
+          <SearchTrip searchTrip = {searchTrip} searchTrips = {searchTrips}/>
+          <TripsList users = {users} trips={filterTrip} />
         </Route>
       </Switch>
     </div>

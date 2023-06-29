@@ -12,8 +12,9 @@ function NewTripForm({addTrip, updatePostFormData, users}){
                 addTrip(event)
                 setFormSubmitted(formSubmitted => !formSubmitted)
             }}>
-                <input onChange={updatePostFormData} type="text" name="name" placeholder="Country name" required/>
-                <input onChange={updatePostFormData} type="text" name="image" placeholder="Date (YYYY-MM-DD)" required/>
+                <input onChange={updatePostFormData} type="text" name="username" placeholder="Insert Username" required/>
+                <input onChange={updatePostFormData} type="text" name="date_visited" placeholder="Date (YYYY-MM-DD)" required/>
+                <input onChange={updatePostFormData} type="text" name="country_name" placeholder="Country name" required/>
                 <input type="submit" value="Add Trip"/>
             </form>}
         </div>

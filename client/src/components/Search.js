@@ -1,10 +1,10 @@
 import {useState} from 'react'
 
 
-function Search({search, searchCountry}) {
+function Search({searchCountry, searchCountries}) {
     return (
         <div className="search-background">
-            <input onChange= {searchCountry} className= "search-bar" value={search} placeholder= 'Search'/>
+            <input onChange= {searchCountries} className= "search-bar" value={searchCountry} placeholder= 'Search'/>
         </div>
     )
 }

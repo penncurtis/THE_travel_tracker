@@ -12,9 +12,8 @@ function Country({country}){
 
     return (
         <div className="card">
-            <h1>Country # {country.id}: {country.country_name}</h1>
-            <img onClick={toggleCard} src={country.country_image} alt={country.country_name}/>
-            <p>{country.country_name}</p>
+            <h1>{country.country_name}</h1>
+            <img onClick={toggleCard} src={country.country_image} alt={country.country_name} className="card-image"/>
         </div>
     )
 }

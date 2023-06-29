@@ -1,8 +1,8 @@
 function Header(){
     return (
         <header>
-            <h1>
-            Travel Tracker Website 🌎🌍🌏
+            <h1 className="header">
+            🌎🌍Travel Tracker Website🌍🌏
             <span className="logo" role="img">
                 
             </span>
