@@ -2,20 +2,24 @@
 
 import ipdb
 
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 from models import db, User, Country, Trip
 
 app = Flask(__name__)
+app.secret_key = 'secretlylethimcook'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hotels.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
 migrate = Migrate(app, db)
+bcrypt = Bcrypt(app)
 
 db.init_app(app)
 
@@ -31,13 +35,47 @@ class Users(Resource):
     
     def post(self):
         data = request.get_json()
-        new_user = User(username=data['username'], password=data['password'], email=data['email'])
+        encrypted_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        new_user = User(username=data['username'], password=encrypted_password, email=data['email'])
         db.session.add(new_user)
         db.session.commit()
         response_body = new_user.to_dict()
         return make_response(jsonify(response_body), 201)
 
 api.add_resource(Users, '/users')
+
+
+###
+
+@app.post('/login')
+def login():
+    json = request.json
+    user = User.query.filter(User.username == json['username']).first()
+    if user and bcrypt.check_password_hash( user.password, json['password'] ):
+        session['user_id'] = user.id
+        return user.to_dict(), 200
+    else:
+        return { 'error': 'Invalid username or password' }, 401
+
+
+@app.get('/check_session')
+def check_session():
+    user_id = session.get('user_id')
+    user = User.query.filter(User.id == user_id).first()
+    if user:
+        return user.to_dict(), 200
+    else:
+        return {"message": "Not logged in"}, 401
+
+
+
+@app.delete('/logout')
+def logout():
+    session['user_id'] = None
+    return {"message": "Successfully logged out"}, 200
+
+###
+
 
 class UserByID(Resource):
     def get(self, id):
@@ -78,12 +116,12 @@ class Trips(Resource):
         response_body = [trip.to_dict() for trip in trips]
         return make_response(jsonify(response_body), 200)
     
-    def post(self, id):
+    def post(self):
         data = request.get_json()
         new_trip = Trip(
             user_id=data['user_id'], 
             country_id=data['country_id'], 
-            date_visited=data['date_visited'].date()
+            date_visited=datetime.strptime(data['date_visited'], '%Y-%m-%d').date()
         )
         db.session.add(new_trip)
         db.session.commit()
